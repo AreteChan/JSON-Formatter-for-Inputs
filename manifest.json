@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "JSON Formatter for Inputs",
+  "version": "1.0",
+  "description": "Automatically formats JSON in input fields.",
+  "permissions": ["activeTab", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["http://localhost:880/server.svc/api/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
