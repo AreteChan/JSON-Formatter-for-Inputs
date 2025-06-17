@@ -3,17 +3,14 @@
   "name": "JSON Formatter for Inputs",
   "version": "1.0",
   "description": "Automatically formats JSON in input fields.",
-  "action": {
-    "default_title": "JSON格式化工具"
-  },
-  "background": {
-    "service_worker": "background.js"
-  },
   "permissions": ["activeTab", "scripting"],
   "content_scripts": [
     {
       "matches": ["http://localhost:880/server.svc/api/*"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "action": {
+    "default_popup": "popup/popup.html"
+  }
 }

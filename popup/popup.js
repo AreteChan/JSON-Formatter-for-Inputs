@@ -18,6 +18,15 @@ function formatJSON(value) {
   }
 }
 
+const observer = new MutationObserver((mutationsList) => {
+  for (let mutation of mutationsList) {
+    if (mutation.type === 'attributes') {
+      console.log(mutation);
+    }
+  }
+});
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const textarea = document.getElementById('jsonInput');
 
@@ -29,4 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
       textarea.value = formattedJSON;
     }
   });
+
+  observer.observe(textarea, {
+    attributes: true,})
 });
