@@ -32,6 +32,9 @@ function setupJSONFormatting() {
   const inputElements = document.querySelectorAll("input, textarea");
 
   inputElements.forEach((input) => {
+    // 跳过只读和禁用的输入框（由 setupReadonlyPolling 处理）
+    if (input.readOnly || input.disabled) return;
+
     let lastValue = input.value; // 缓存上一次的值
 
     const handleInput = debounce((event) => {
@@ -63,5 +66,44 @@ function setupJSONFormatting() {
   });
 }
 
+// 设置只读输入框的JSON格式化（轮询方式，处理系统自动填入的场景）
+function setupReadonlyPolling() {
+  // WeakMap 缓存每个字段的上次值，元素移除后自动GC
+  var cachedValues = new WeakMap();
+
+  // 检查并格式化单个字段
+  function checkField(el) {
+    var currentRaw = el.value;
+    var lastValue = cachedValues.get(el);
+
+    // 内容未变化，跳过
+    if (currentRaw === lastValue) return;
+
+    // 先缓存当前原始值，防止重入
+    cachedValues.set(el, currentRaw);
+
+    // 如果是有效的JSON，则格式化
+    if (currentRaw && isJSON(currentRaw)) {
+      var formatted = formatJSON(currentRaw);
+      if (formatted !== currentRaw) {
+        el.value = formatted;
+        // 更新缓存为格式化后的值，避免下次轮询重复格式化
+        cachedValues.set(el, formatted);
+      }
+    }
+  }
+
+  // 立即执行：处理页面加载时已有的内容
+  var readonlyElements = document.querySelectorAll("textarea[readonly], input[readonly], textarea[disabled], input[disabled]");
+  readonlyElements.forEach(checkField);
+
+  // 定期轮询：检测系统后续通过 JS 填入的 JSON
+  setInterval(function () {
+    var elements = document.querySelectorAll("textarea[readonly], input[readonly], textarea[disabled], input[disabled]");
+    elements.forEach(checkField);
+  }, 1000);
+}
+
 // 初始化
 setupJSONFormatting();
+setupReadonlyPolling();
